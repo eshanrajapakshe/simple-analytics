@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News Analytics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: #f8fafc;
+        color: #334155;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 1.1rem;
+      }
+
+      .config-warning {
+        background: linear-gradient(135deg, #ff6b6b, #ffa726);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
+
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-label {
+        color: #64748b;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+
+      .stat-change {
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        font-weight: 500;
+      }
+
+      .stat-change.positive {
+        color: #10b981;
+      }
+
+      .stat-change.negative {
+        color: #ef4444;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .chart-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        height: 400px;
+        position: relative;
+      }
+
+      .chart-container canvas {
+        max-height: 300px !important;
+        height: 300px !important;
+      }
+
+      .chart-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+      }
+
+      .bottom-charts {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 2rem;
+        margin-bottom: 2rem;
+
+        .top-pages {
+          grid-column: span 2 / span 2;
+        }
+
+        .scroll-depth {
+          grid-row-start: 2;
+        }
+
+        .time-spent {
+          grid-row-start: 2;
+        }
+      }
+
+      .data-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+      }
+
+      .table-header {
+        background: #f8fafc;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .table-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .table-content {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 1rem 2rem;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      th {
+        background: #f8fafc;
+        font-weight: 600;
+        color: #475569;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      tr:hover {
+        background: #f8fafc;
+      }
+
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem;
+        color: #64748b;
+      }
+
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 1rem;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .controls {
+        background: white;
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .control-group label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #475569;
+      }
+
+      select,
+      input {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.9rem;
+      }
+
+      .refresh-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .refresh-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .status-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .status-connected {
+        background: #10b981;
+        color: white;
+      }
+
+      .status-error {
+        background: #ef4444;
+        color: white;
+      }
+
+      .status-loading {
+        background: #f59e0b;
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .bottom-charts {
+          grid-template-columns: 1fr;
+        }
+
+        .controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="status-indicator" id="statusIndicator">🔄 Loading...</div>
+
+    <div class="container">
+      <div class="header">
+        <h1>📊 News Analytics Dashboard</h1>
+        <p>
+          Real-time insights into your website's performance and user behavior
+        </p>
+      </div>
+
+      <div class="config-warning" id="configWarning" style="display: none">
+        <strong>⚠️ Configuration Required</strong><br />
+        Please update your Supabase credentials in the script section at the
+        bottom of this page.
+      </div>
+
+      <div class="controls">
+        <div class="control-group">
+          <label for="websiteSelect">Website</label>
+          <select id="websiteSelect">
+            <option value="">All Websites</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="timeRange">Time Range</label>
+          <select id="timeRange">
+            <option value="24h">Last 24 Hours</option>
+            <option value="7d">Last 7 Days</option>
+            <option value="30d">Last 30 Days</option>
+            <option value="90d">Last 90 Days</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label>&nbsp;</label>
+          <button class="refresh-btn" onclick="refreshDashboard()">
+            🔄 Refresh Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Metrics -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalPageViews">-</div>
+          <div class="stat-label">Total Page Views</div>
+          <div class="stat-change" id="pageViewsChange"></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value" id="uniqueUsers">-</div>
+          <div class="stat-label">Unique Users</div>
+          <div class="stat-change" id="usersChange"></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value" id="avgTimeSpent">-</div>
+          <div class="stat-label">Avg. Time Spent</div>
+          <div class="stat-change" id="timeChange"></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-value" id="avgScrollDepth">-</div>
+          <div class="stat-label">Avg. Scroll Depth</div>
+          <div class="stat-change" id="scrollChange"></div>
+        </div>
+      </div>
+
+      <!-- Main Charts -->
+      <div class="charts-grid">
+        <div class="chart-container">
+          <div class="chart-title">📈 Page Views Over Time</div>
+          <canvas id="pageViewsChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-title">📱 Device Types</div>
+          <canvas id="deviceChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Bottom Charts -->
+      <div class="bottom-charts">
+        <div class="chart-container top-pages">
+          <div class="chart-title">🔗 Top Pages</div>
+          <canvas id="topPagesChart"></canvas>
+        </div>
+
+        <div class="chart-container scroll-depth">
+          <div class="chart-title">📊 Scroll Depth Distribution</div>
+          <canvas id="scrollDepthChart"></canvas>
+        </div>
+
+        <div class="chart-container time-spent">
+          <div class="chart-title">⏱️ Time Spent Distribution</div>
+          <canvas id="timeSpentChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Activity Table -->
+      <div class="data-table">
+        <div class="table-header">
+          <div class="table-title">🕐 Recent Activity</div>
+        </div>
+        <div class="table-content">
+          <table id="recentActivityTable">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Event</th>
+                <th>Page</th>
+                <th>User</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="activityTableBody">
+              <tr>
+                <td colspan="5" class="loading">
+                  <div class="spinner"></div>
+                  Loading recent activity...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Configuration - UPDATE THESE WITH YOUR SUPABASE CREDENTIALS
+      const config = {
+        supabaseUrl: "https://dnwlwkmeeetwbvfwnefw.supabase.co",
+        supabaseKey:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRud2x3a21lZWV0d2J2ZnduZWZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk0MzMyNjUsImV4cCI6MjA2NTAwOTI2NX0.Jijf_cRKBFhCj2AIyMm9q7WGPNqR0hEyIZvxHASrF58", // Replace with your Supabase anon key
+        trackingTable: "analytics_events",
+      };
+
+      // Global variables
+      let charts = {};
+      let currentData = {};
+
+      // Initialize dashboard
+      document.addEventListener("DOMContentLoaded", function () {
+        checkConfiguration();
+        initializeCharts();
+        loadDashboard();
+
+        // Set up auto-refresh every 30 seconds
+        setInterval(refreshDashboard, 30000);
+
+        // Event listeners
+        document
+          .getElementById("timeRange")
+          .addEventListener("change", loadDashboard);
+        document
+          .getElementById("websiteSelect")
+          .addEventListener("change", loadDashboard);
+      });
+
+      function checkConfiguration() {
+        const isConfigured =
+          config.supabaseUrl !== "YOUR_SUPABASE_URL" &&
+          config.supabaseKey !== "YOUR_SUPABASE_ANON_KEY";
+
+        if (!isConfigured) {
+          document.getElementById("configWarning").style.display = "block";
+          updateStatus("error", "❌ Not Configured");
+          return false;
+        }
+
+        return true;
+      }
+
+      function updateStatus(type, message) {
+        const indicator = document.getElementById("statusIndicator");
+        indicator.textContent = message;
+        indicator.className = `status-indicator status-${type}`;
+      }
+
+      async function fetchAnalyticsData() {
+        try {
+          updateStatus("loading", "🔄 Loading data...");
+
+          const timeRange = document.getElementById("timeRange").value;
+          const websiteId = document.getElementById("websiteSelect").value;
+
+          // Calculate date range
+          const endDate = new Date();
+          const startDate = new Date();
+
+          switch (timeRange) {
+            case "24h":
+              startDate.setHours(startDate.getHours() - 24);
+              break;
+            case "7d":
+              startDate.setDate(startDate.getDate() - 7);
+              break;
+            case "30d":
+              startDate.setDate(startDate.getDate() - 30);
+              break;
+            case "90d":
+              startDate.setDate(startDate.getDate() - 90);
+              break;
+          }
+
+          // Build query filters
+          let queryParams = `timestamp=gte.${startDate.toISOString()}`;
+          if (websiteId) {
+            queryParams += `&website_id=eq.${websiteId}`;
+          }
+
+          // Fetch data using direct table queries
+          const baseUrl = `${config.supabaseUrl}/rest/v1/${config.trackingTable}`;
+          const headers = {
+            apikey: config.supabaseKey,
+            Authorization: `Bearer ${config.supabaseKey}`,
+            "Content-Type": "application/json",
+          };
+
+          // Fetch all data
+          const allDataResponse = await fetch(
+            `${baseUrl}?select=*&${queryParams}&order=timestamp.desc&limit=1000`,
+            {
+              headers: headers,
+            }
+          );
+
+          if (!allDataResponse.ok) {
+            throw new Error(
+              `HTTP ${allDataResponse.status}: ${allDataResponse.statusText}`
+            );
+          }
+
+          const allData = await allDataResponse.json();
+
+          console.log(allData, "allData");
+
+          // Process data
+          const processedData = processAnalyticsData(allData);
+          currentData = processedData;
+
+          updateStatus("connected", "✅ Data loaded");
+          return processedData;
+        } catch (error) {
+          console.error("Error fetching analytics data:", error);
+          updateStatus("error", "❌ Error loading data");
+          throw error;
+        }
+      }
+
+      function processAnalyticsData(rawData) {
+        const data = {
+          totalPageViews: 0,
+          uniqueUsers: new Set(),
+          uniqueSessions: new Set(),
+          pageViewsByHour: {},
+          topPages: {},
+          deviceTypes: {},
+          scrollDepths: [],
+          timeSpentValues: [],
+          recentActivity: [],
+        };
+
+        rawData.forEach((event) => {
+          // Basic counts
+          if (event.event_type === "page_view") {
+            data.totalPageViews++;
+
+            // Top pages
+            const page = new URL(event.page_url).pathname;
+            data.topPages[page] = (data.topPages[page] || 0) + 1;
+
+            // Page views by hour
+            const hour = new Date(event.timestamp).toISOString().slice(0, 13);
+            data.pageViewsByHour[hour] = (data.pageViewsByHour[hour] || 0) + 1;
+          }
+
+          // Unique users and sessions
+          data.uniqueUsers.add(event.user_id);
+          data.uniqueSessions.add(event.session_id);
+
+          // Device info
+          if (event.device_info) {
+            const userAgent = event.device_info.userAgent || "";
+            let deviceType = "Desktop";
+            if (/Mobile|Android|iPhone/i.test(userAgent)) {
+              deviceType = "Mobile";
+            } else if (/Tablet|iPad/i.test(userAgent)) {
+              deviceType = "Tablet";
+            }
+            data.deviceTypes[deviceType] =
+              (data.deviceTypes[deviceType] || 0) + 1;
+          }
+
+          // Scroll depth from heartbeat events
+          if (
+            event.event_type === "heartbeat" &&
+            event.metadata?.maxScrollDepth
+          ) {
+            data.scrollDepths.push(event.metadata.maxScrollDepth);
+          }
+
+          // Time spent from heartbeat events
+          if (event.event_type === "heartbeat" && event.metadata?.timeSpent) {
+            data.timeSpentValues.push(event.metadata.timeSpent / 1000); // Convert to seconds
+          }
+
+          // Recent activity (limit to last 50)
+          if (data.recentActivity.length < 50) {
+            data.recentActivity.push({
+              timestamp: event.timestamp,
+              event_type: event.event_type,
+              page_url: event.page_url,
+              user_id: event.user_id,
+              metadata: event.metadata,
+            });
+          }
+        });
+
+        // Convert sets to counts
+        data.uniqueUsersCount = data.uniqueUsers.size;
+        data.uniqueSessionsCount = data.uniqueSessions.size;
+
+        return data;
+      }
+
+      function initializeCharts() {
+        try {
+          // Page Views Chart
+          const pageViewsCanvas = document.getElementById("pageViewsChart");
+          if (!pageViewsCanvas) {
+            console.error("pageViewsChart canvas not found");
+            return;
+          }
+
+          const pageViewsCtx = pageViewsCanvas.getContext("2d");
+          charts.pageViews = new Chart(pageViewsCtx, {
+            type: "line",
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: "Page Views",
+                  data: [],
+                  borderColor: "#667eea",
+                  backgroundColor: "rgba(102, 126, 234, 0.1)",
+                  fill: true,
+                  tension: 0.4,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              aspectRatio: 2,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                },
+              },
+              plugins: {
+                legend: {
+                  display: true,
+                },
+              },
+            },
+          });
+
+          // Device Chart
+          const deviceCtx = document
+            .getElementById("deviceChart")
+            .getContext("2d");
+          charts.device = new Chart(deviceCtx, {
+            type: "doughnut",
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  data: [],
+                  backgroundColor: ["#667eea", "#764ba2", "#f093fb"],
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              aspectRatio: 1,
+            },
+          });
+
+          // Top Pages Chart
+          const topPagesCtx = document
+            .getElementById("topPagesChart")
+            .getContext("2d");
+          charts.topPages = new Chart(topPagesCtx, {
+            type: "bar",
+            data: {
+              labels: [],
+              datasets: [
+                {
+                  label: "Page Views",
+                  data: [],
+                  backgroundColor: "#667eea",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              aspectRatio: 1.5,
+              indexAxis: "y",
+            },
+          });
+
+          // Scroll Depth Chart
+          const scrollCtx = document
+            .getElementById("scrollDepthChart")
+            .getContext("2d");
+          charts.scrollDepth = new Chart(scrollCtx, {
+            type: "bar",
+            data: {
+              labels: ["0-25%", "25-50%", "50-75%", "75-100%"],
+              datasets: [
+                {
+                  label: "Users",
+                  data: [0, 0, 0, 0],
+                  backgroundColor: "#10b981",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              aspectRatio: 1.5,
+            },
+          });
+
+          // Time Spent Chart
+          const timeCtx = document
+            .getElementById("timeSpentChart")
+            .getContext("2d");
+          charts.timeSpent = new Chart(timeCtx, {
+            type: "bar",
+            data: {
+              labels: ["0-30s", "30-60s", "1-3m", "3-5m", "5m+"],
+              datasets: [
+                {
+                  label: "Sessions",
+                  data: [0, 0, 0, 0, 0],
+                  backgroundColor: "#f59e0b",
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              aspectRatio: 1.5,
+            },
+          });
+
+          console.log("Charts initialized successfully");
+        } catch (error) {
+          console.error("Error initializing charts:", error);
+          updateStatus("error", "❌ Chart initialization failed");
+        }
+      }
+
+      function updateCharts(data) {
+        try {
+          // Update Page Views Chart
+          if (charts.pageViews && data.pageViewsByHour) {
+            const sortedHours = Object.keys(data.pageViewsByHour).sort();
+            const pageViewsData = sortedHours.map(
+              (hour) => data.pageViewsByHour[hour]
+            );
+            const pageViewsLabels = sortedHours.map((hour) => {
+              const date = new Date(hour + ":00:00Z");
+              return date.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+            });
+
+            charts.pageViews.data.labels = pageViewsLabels;
+            charts.pageViews.data.datasets[0].data = pageViewsData;
+            charts.pageViews.update("none"); // Use 'none' animation for better performance
+          }
+
+          // Update Device Chart
+          if (charts.device && data.deviceTypes) {
+            const deviceLabels = Object.keys(data.deviceTypes);
+            const deviceData = Object.values(data.deviceTypes);
+            charts.device.data.labels = deviceLabels;
+            charts.device.data.datasets[0].data = deviceData;
+            charts.device.update("none");
+          }
+
+          // Update Top Pages Chart
+          if (charts.topPages && data.topPages) {
+            const topPages = Object.entries(data.topPages)
+              .sort(([, a], [, b]) => b - a)
+              .slice(0, 10);
+
+            charts.topPages.data.labels = topPages.map(([page]) =>
+              page.length > 30 ? page.substring(0, 30) + "..." : page
+            );
+            charts.topPages.data.datasets[0].data = topPages.map(
+              ([, views]) => views
+            );
+            charts.topPages.update("none");
+          }
+
+          // Update Scroll Depth Chart
+          if (charts.scrollDepth && data.scrollDepths) {
+            const scrollBuckets = [0, 0, 0, 0];
+            data.scrollDepths.forEach((depth) => {
+              if (depth <= 25) scrollBuckets[0]++;
+              else if (depth <= 50) scrollBuckets[1]++;
+              else if (depth <= 75) scrollBuckets[2]++;
+              else scrollBuckets[3]++;
+            });
+            charts.scrollDepth.data.datasets[0].data = scrollBuckets;
+            charts.scrollDepth.update("none");
+          }
+
+          // Update Time Spent Chart
+          if (charts.timeSpent && data.timeSpentValues) {
+            const timeBuckets = [0, 0, 0, 0, 0];
+            data.timeSpentValues.forEach((time) => {
+              if (time <= 30) timeBuckets[0]++;
+              else if (time <= 60) timeBuckets[1]++;
+              else if (time <= 180) timeBuckets[2]++;
+              else if (time <= 300) timeBuckets[3]++;
+              else timeBuckets[4]++;
+            });
+            charts.timeSpent.data.datasets[0].data = timeBuckets;
+            charts.timeSpent.update("none");
+          }
+        } catch (error) {
+          console.error("Error updating charts:", error);
+        }
+      }
+
+      function updateMetrics(data) {
+        // Total Page Views
+        document.getElementById("totalPageViews").textContent =
+          data.totalPageViews.toLocaleString();
+
+        // Unique Users
+        document.getElementById("uniqueUsers").textContent =
+          data.uniqueUsersCount.toLocaleString();
+
+        // Average Time Spent
+        const avgTime =
+          data.timeSpentValues.length > 0
+            ? data.timeSpentValues.reduce((a, b) => a + b, 0) /
+              data.timeSpentValues.length
+            : 0;
+        document.getElementById("avgTimeSpent").textContent =
+          formatTime(avgTime);
+
+        // Average Scroll Depth
+        const avgScroll =
+          data.scrollDepths.length > 0
+            ? data.scrollDepths.reduce((a, b) => a + b, 0) /
+              data.scrollDepths.length
+            : 0;
+        document.getElementById("avgScrollDepth").textContent =
+          Math.round(avgScroll) + "%";
+      }
+
+      function updateRecentActivity(data) {
+        const tbody = document.getElementById("activityTableBody");
+        tbody.innerHTML = "";
+
+        if (data.recentActivity.length === 0) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" style="text-align: center; color: #64748b;">No recent activity</td></tr>';
+          return;
+        }
+
+        data.recentActivity.slice(0, 20).forEach((event) => {
+          const row = document.createElement("tr");
+          const eventTime = new Date(event.timestamp).toLocaleString();
+          const eventType = event.event_type.replace("_", " ").toUpperCase();
+          const page = new URL(event.page_url).pathname;
+          const userId = event.user_id.substring(0, 8) + "...";
+
+          let details = "";
+          if (event.metadata) {
+            if (event.event_type === "link_click") {
+              details = event.metadata.linkText || "Link clicked";
+            } else if (event.event_type === "heartbeat") {
+              details = `${Math.round(event.metadata.timeSpent / 1000)}s, ${
+                event.metadata.scrollDepth
+              }%`;
+            } else if (event.metadata.platform) {
+              details = event.metadata.platform;
+            }
+          }
+
+          row.innerHTML = `
+                    <td>${eventTime}</td>
+                    <td><span style="background: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${eventType}</span></td>
+                    <td>${page}</td>
+                    <td>${userId}</td>
+                    <td>${details}</td>
+                `;
+          tbody.appendChild(row);
+        });
+      }
+
+      async function loadDashboard() {
+        try {
+          if (!checkConfiguration()) return;
+
+          const data = await fetchAnalyticsData();
+          updateMetrics(data);
+          updateCharts(data);
+          updateRecentActivity(data);
+        } catch (error) {
+          console.error("Error loading dashboard:", error);
+          updateStatus("error", "❌ Error loading dashboard");
+        }
+      }
+
+      function refreshDashboard() {
+        loadDashboard();
+      }
+
+      function formatTime(seconds) {
+        if (seconds < 60) return Math.round(seconds) + "s";
+        if (seconds < 3600) return Math.round(seconds / 60) + "m";
+        return Math.round((seconds / 3600) * 10) / 10 + "h";
+      }
+    </script>
+  </body>
+</html>

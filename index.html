@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News Analytics Tracker - Demo Hub</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .hero {
+        text-align: center;
+        color: white;
+        padding: 4rem 2rem;
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .hero p {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+      }
+
+      .hero-badges {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 2rem;
+      }
+
+      .badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        color: white;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .main-content {
+        display: grid;
+        gap: 2rem;
+        margin-bottom: 3rem;
+      }
+
+      .section-grid {
+        display: grid;
+        gap: 2rem;
+      }
+
+      .section {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .section-icon {
+        font-size: 2.5rem;
+        margin-right: 1rem;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .section-description {
+        color: #64748b;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+      }
+
+      .card-grid {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .demo-card {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+
+      .demo-card:hover {
+        border-color: #667eea;
+        background: #f1f5f9;
+        transform: translateX(5px);
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .card-description {
+        color: #64748b;
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+
+      .card-meta {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e2e8f0;
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+
+      .dashboard-section {
+        grid-column: 1 / -1;
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: white;
+      }
+
+      .dashboard-section .section-title {
+        color: white;
+      }
+
+      .dashboard-section .section-description {
+        color: #cbd5e1;
+      }
+
+      .dashboard-section .demo-card {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      .dashboard-section .demo-card:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+
+      .dashboard-section .card-title {
+        color: white;
+      }
+
+      .dashboard-section .card-description {
+        color: #cbd5e1;
+      }
+
+      .dashboard-section .card-meta {
+        color: #94a3b8;
+        border-top-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .getting-started {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .step {
+        text-align: center;
+      }
+
+      .step-number {
+        width: 40px;
+        height: 40px;
+        background: #667eea;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        margin: 0 auto 1rem;
+      }
+
+      .step-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1e293b;
+      }
+
+      .step-description {
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      .analytics-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .footer {
+        text-align: center;
+        color: white;
+        padding: 2rem;
+        opacity: 0.8;
+      }
+
+      @media (max-width: 768px) {
+        .hero h1 {
+          font-size: 2.5rem;
+        }
+
+        .hero p {
+          font-size: 1.1rem;
+        }
+
+        .section-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-badges {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+      }
+
+      .feature {
+        text-align: center;
+        padding: 1rem;
+      }
+
+      .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .feature-title {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 0.5rem;
+      }
+
+      .feature-description {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="analytics-status" id="analyticsStatus">📊 Analytics Active</div>
+
+    <div class="container">
+      <!-- Hero Section -->
+      <div class="hero">
+        <h1>📊 News Analytics Tracker</h1>
+        <p>
+          A comprehensive analytics solution for news publishers. Track user
+          behavior, measure engagement, and gain valuable insights into your
+          audience.
+        </p>
+      </div>
+
+      <!-- Getting Started -->
+      <div class="getting-started">
+        <h2 style="text-align: center; margin-bottom: 1rem; color: #1e293b">
+          🚀 Try the Demo
+        </h2>
+        <p style="text-align: center; color: #64748b; margin-bottom: 2rem">
+          Experience the full analytics workflow: test the tracking, generate
+          data, and view insights.
+        </p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-title">Test Tracking</div>
+            <div class="step-description">
+              Visit our test pages to generate analytics data and see tracking
+              in action
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-title">Explore Features</div>
+            <div class="step-description">
+              Try scrolling, clicking links, and triggering custom events
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">View Analytics</div>
+            <div class="step-description">
+              Check the dashboard to see your generated data and insights
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Sections -->
+      <div class="main-content">
+        <div class="section-grid">
+          <!-- Testing Section -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-icon">🧪</div>
+              <div class="section-title">Test Pages</div>
+            </div>
+            <div class="section-description">
+              Interactive test pages to experience the analytics tracking in
+              action. Generate real data by interacting with content.
+            </div>
+
+            <div class="card-grid">
+              <a href="demo.html" class="demo-card">
+                <div class="card-title">🎮 Interactive Demo</div>
+                <div class="card-description">
+                  Complete testing environment with debug panel, real-time
+                  metrics, and all tracking features enabled.
+                </div>
+                <div class="card-meta">
+                  ✅ Debug panel • ⏱️ Real-time updates • 🔗 Link testing • 📊
+                  Custom events
+                </div>
+              </a>
+
+              <a href="test-page.html" class="demo-card">
+                <div class="card-title">📰 Realistic News Article</div>
+                <div class="card-description">
+                  Full-length article simulation with natural reading
+                  experience. Perfect for testing scroll depth and time
+                  tracking.
+                </div>
+                <div class="card-meta">
+                  📖 Long-form content • 🌊 Scroll tracking • 📱 Social sharing
+                  • 💌 Newsletter signup
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Analytics Dashboard Section -->
+          <div class="section dashboard-section">
+            <div class="section-header">
+              <div class="section-icon">📈</div>
+              <div class="section-title">Analytics Dashboard</div>
+            </div>
+            <div class="section-description">
+              View real-time analytics data collected from the test pages. See
+              charts, metrics, and user behavior insights.
+            </div>
+
+            <div class="card-grid">
+              <a href="analytics-dashboard.html" class="demo-card">
+                <div class="card-title">
+                  📊 Live Dashboard
+                  <span
+                    style="
+                      background: #ef4444;
+                      color: white;
+                      padding: 2px 6px;
+                      border-radius: 10px;
+                      font-size: 0.7rem;
+                    "
+                    >LIVE DATA</span
+                  >
+                </div>
+                <div class="card-description">
+                  Interactive dashboard showing real-time analytics data. View
+                  page views, user engagement, scroll depth, and more.
+                </div>
+                <div class="card-meta">
+                  📈 Real-time charts • 👥 User metrics • 🕐 Activity feed • 📱
+                  Device analytics
+                </div>
+              </a>
+            </div>
+
+            <div
+              style="
+                margin-top: 1.5rem;
+                padding: 1rem;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+              "
+            >
+              <h4 style="color: white; margin-bottom: 0.5rem">💡 Pro Tip</h4>
+              <p style="color: #cbd5e1; font-size: 0.9rem; margin: 0">
+                First visit the test pages to generate some analytics data, then
+                check the dashboard to see your activity tracked in real-time!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documentation Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon">📚</div>
+          <div class="section-title">Documentation</div>
+        </div>
+        <div class="section-description">
+          Comprehensive guides to help you implement and customize the analytics
+          tracker for your website.
+        </div>
+
+        <div class="card-grid">
+          <a href="DEPLOYMENT_GUIDE.md" class="demo-card">
+            <div class="card-title">🚀 Quick Deployment</div>
+            <div class="card-description">
+              2-step setup guide for getting started quickly. Configure once and
+              deploy everywhere.
+            </div>
+            <div class="card-meta">
+              ⚡ 2-minute setup • 🎯 Centralized config • 📋 Copy-paste ready
+            </div>
+          </a>
+
+          <a href="SETUP_GUIDE.md" class="demo-card">
+            <div class="card-title">⚙️ Detailed Setup</div>
+            <div class="card-description">
+              Complete setup instructions including database configuration and
+              advanced options.
+            </div>
+            <div class="card-meta">
+              🗄️ Database setup • 🔧 Configuration • 🛠️ Troubleshooting
+            </div>
+          </a>
+
+          <a href="DASHBOARD_GUIDE.md" class="demo-card">
+            <div class="card-title">📊 Dashboard Guide</div>
+            <div class="card-description">
+              Learn how to use the analytics dashboard and understand your data
+              insights.
+            </div>
+            <div class="card-meta">
+              📈 Chart explanations • 🔍 Data insights • 🎨 Customization
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Technical Information -->
+      <div class="getting-started">
+        <h2 style="text-align: center; margin-bottom: 1rem; color: #1e293b">
+          🔧 Technical Details
+        </h2>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">📊</div>
+            <div class="step-title">Database</div>
+            <div class="step-description">
+              Powered by Supabase with PostgreSQL backend and real-time
+              subscriptions
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">⚡</div>
+            <div class="step-title">Performance</div>
+            <div class="step-description">
+              Optimized tracking with debounced events and failed event recovery
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">🎨</div>
+            <div class="step-title">Visualization</div>
+            <div class="step-description">
+              Modern dashboard with Chart.js and responsive design
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>
+        📊 News Analytics Tracker • Built with vanilla JavaScript and Supabase
+      </p>
+      <p style="margin-top: 0.5rem; font-size: 0.9rem">
+        Experience modern analytics tracking with privacy-first principles
+      </p>
+    </div>
+
+    <!-- Analytics Configuration -->
+    <script>
+      window.NewsAnalytics = {
+        websiteId: "analytics-demo-hub",
+        debug: true,
+        scrollThreshold: 75,
+        timeInterval: 5000,
+      };
+    </script>
+
+    <!-- Load the analytics tracker -->
+    <script src="news-analytics-tracker.js"></script>
+
+    <!-- Page functionality -->
+    <script>
+      // Update analytics status
+      function updateAnalyticsStatus() {
+        const status = document.getElementById("analyticsStatus");
+
+        if (window.NewsAnalytics && window.NewsAnalytics.getUserId) {
+          status.textContent = "✅ Analytics Active";
+          status.style.background = "#10b981";
+        } else {
+          status.textContent = "❌ Analytics Inactive";
+          status.style.background = "#ef4444";
+        }
+      }
+
+      // Track external link clicks
+      document.addEventListener("click", function (event) {
+        const link = event.target.closest("a");
+        if (link && link.href.endsWith(".md")) {
+          // Track documentation clicks
+          if (window.NewsAnalytics && window.NewsAnalytics.track) {
+            NewsAnalytics.track("documentation_click", {
+              documentName: link.href.split("/").pop(),
+              linkText: link.textContent.trim(),
+              section: "documentation",
+            });
+          }
+        }
+      });
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(updateAnalyticsStatus, 1000);
+
+        // Console welcome message
+        console.log(`
+🎉 WELCOME TO NEWS ANALYTICS TRACKER DEMO!
+
+This index page is also being tracked! Check out:
+
+1. 📈 Analytics Dashboard: analytics-dashboard.html
+2. 🧪 Interactive Demo: demo.html  
+3. 📰 Test Article: test-page.html
+
+Your activity on this page is being recorded. Visit the dashboard to see:
+- Page views and time spent
+- Scroll depth tracking
+- Link click analytics
+- Device information
+
+Happy testing! 🚀
+            `);
+      });
+    </script>
+  </body>
+</html>

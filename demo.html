@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News Analytics Tracker - Test Demo</title>
+    <style>
+      body {
+        font-family: "Georgia", serif;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        color: #333;
+      }
+
+      .config-warning {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        color: #856404;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .config-warning strong {
+        color: #e17055;
+      }
+
+      .header {
+        text-align: center;
+        padding: 40px 0;
+        border-bottom: 2px solid #e0e0e0;
+        margin-bottom: 30px;
+      }
+
+      .test-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+      }
+
+      .test-links a {
+        display: inline-block;
+        margin: 5px 10px 5px 0;
+        padding: 8px 16px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .test-links a:hover {
+        background: #0056b3;
+      }
+
+      .external-link {
+        background: #28a745 !important;
+      }
+
+      .social-share {
+        background: #17a2b8;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      .debug-panel {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #343a40;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        max-width: 300px;
+        z-index: 1000;
+      }
+
+      .analytics-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 1000;
+        font-weight: bold;
+      }
+
+      .scroll-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: #007bff;
+        z-index: 1001;
+        transition: width 0.3s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+
+    <div class="analytics-status" id="analyticsStatus">🔄 Loading...</div>
+
+    <div class="config-warning" id="configWarning" style="display: none;">
+      <strong>⚠️ ANALYTICS LOADING</strong><br />
+      Analytics tracker is initializing...<br />
+      If this persists, check the browser console for errors.
+    </div>
+
+    <div class="header">
+      <h1>🧪 News Analytics Tracker Demo</h1>
+      <p>
+        This page demonstrates all tracking features of the news analytics
+        system.
+      </p>
+    </div>
+
+    <div class="test-section">
+      <h3>🔗 Link Click Tracking</h3>
+      <p>Click these links to test link tracking:</p>
+      <div class="test-links">
+        <a href="#section1">Internal Link 1</a>
+        <a href="#section2">Internal Link 2</a>
+        <a href="https://supabase.com" target="_blank" class="external-link"
+          >Supabase (External)</a
+        >
+        <a href="https://github.com" target="_blank" class="external-link"
+          >GitHub (External)</a
+        >
+        <a href="/article-1">Article 1</a>
+        <a href="/article-2">Article 2</a>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h3>📱 Custom Event Tracking</h3>
+      <p>Click these buttons to test custom events:</p>
+      <button class="social-share" data-platform="twitter">
+        Share on Twitter
+      </button>
+      <button class="social-share" data-platform="facebook">
+        Share on Facebook
+      </button>
+      <button onclick="testNewsletterSignup()">Newsletter Signup</button>
+      <button onclick="testCommentSubmit()">Comment Submit</button>
+    </div>
+
+    <div class="test-section" id="section1">
+      <h3>📊 Scroll Depth Tracking</h3>
+      <p>
+        As you scroll down this page, the system tracks your scroll depth. Keep
+        scrolling to trigger milestone events at 25%, 50%, 75%, and 100%.
+      </p>
+
+      <p>
+        The scroll indicator at the top of the page shows your current progress.
+        The system automatically detects when users have read a significant
+        portion of the content.
+      </p>
+    </div>
+
+    <div class="test-section" id="section2">
+      <h3>⏱️ Time Tracking</h3>
+      <p>
+        The system tracks how much time you spend on this page. It uses the Page
+        Visibility API to only count time when the page is actually visible and
+        active.
+      </p>
+
+      <p>
+        Try switching to another tab and back to see how the time tracking
+        behaves. The heartbeat interval for this demo is set to 3 seconds for
+        faster testing.
+      </p>
+    </div>
+
+    <!-- Add more content to make the page scrollable -->
+    <div style="height: 150vh">
+      <div class="test-section">
+        <h3>🎯 Advanced Testing</h3>
+        <p>
+          This section tests scroll milestone tracking. The system will trigger
+          events when you scroll past certain thresholds.
+        </p>
+
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat.
+        </p>
+
+        <p>
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+          dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est
+          laborum.
+        </p>
+
+        <p>
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+          accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae
+          ab illo inventore veritatis et quasi architecto beatae vitae dicta
+          sunt explicabo.
+        </p>
+
+        <p>
+          Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
+          fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem
+          sequi nesciunt.
+        </p>
+
+        <h4>🏁 End of Content</h4>
+        <p>
+          <strong>Congratulations!</strong> If you've scrolled this far, you've
+          triggered several analytics events. Check the debug panel and your
+          Supabase database to see the tracked data.
+        </p>
+      </div>
+    </div>
+
+    <div class="debug-panel" id="debugPanel">
+      <h4>📊 Analytics Debug</h4>
+      <div>Status: <span id="debugStatus">Loading...</span></div>
+      <div>User ID: <span id="userId">-</span></div>
+      <div>Session: <span id="sessionId">-</span></div>
+      <div>Time: <span id="timeSpent">0</span>s</div>
+      <div>Scroll: <span id="scrollDepth">0</span>%</div>
+      <div>Max Scroll: <span id="maxScrollDepth">0</span>%</div>
+      <div>Events: <span id="eventCount">0</span></div>
+      <button
+        onclick="sendTestEvent()"
+        style="
+          margin-top: 10px;
+          padding: 5px 10px;
+          background: #ffc107;
+          border: none;
+          border-radius: 3px;
+          cursor: pointer;
+        "
+      >
+        Test Event
+      </button>
+    </div>
+
+    <!-- Analytics Configuration -->
+    <script>
+      window.NewsAnalytics = {
+        websiteId: "demo-test-site", // Unique identifier for this site
+        debug: true, // Enable console logging
+        scrollThreshold: 75, // Trigger "read" event at 75%
+        timeInterval: 3000, // Send heartbeat every 3 seconds
+      };
+    </script>
+
+    <!-- Load the analytics tracker -->
+    <script src="news-analytics-tracker.js"></script>
+
+    <!-- Demo page functionality -->
+    <script>
+      let eventCount = 0;
+
+      // Update scroll indicator
+      function updateScrollIndicator() {
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent =
+          scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        document.getElementById("scrollIndicator").style.width =
+          scrollPercent + "%";
+      }
+
+      // Update debug panel
+      function updateDebugPanel() {
+        // With built-in configuration, we just check if the analytics is available
+        const isConfigured = window.NewsAnalytics !== undefined;
+
+        const isActive = window.NewsAnalytics && window.NewsAnalytics.getUserId;
+
+        // Update status indicator
+        const statusEl = document.getElementById("analyticsStatus");
+        const warningEl = document.getElementById("configWarning");
+
+        // Check if analytics is properly configured by checking if the tracker is active
+        // The tracker script now has built-in default config, so we just check if it's working
+        const usingDefaults = false; // Always false since we have built-in config now
+
+        if (!isConfigured || usingDefaults) {
+          statusEl.textContent = "❌ Not Configured";
+          statusEl.style.background = "#dc3545";
+          statusEl.style.color = "white";
+          warningEl.style.display = "block";
+        } else if (isActive) {
+          statusEl.textContent = "✅ Analytics Active";
+          statusEl.style.background = "#28a745";
+          statusEl.style.color = "white";
+          warningEl.style.display = "none";
+        } else {
+          statusEl.textContent = "🔄 Loading...";
+          statusEl.style.background = "#ffc107";
+          statusEl.style.color = "#333";
+          warningEl.style.display = "none";
+        }
+
+        // Update debug panel
+        if (isActive) {
+          document.getElementById("debugStatus").textContent = "Active";
+          document.getElementById("userId").textContent =
+            NewsAnalytics.getUserId()?.substring(0, 8) + "...";
+          document.getElementById("sessionId").textContent =
+            NewsAnalytics.getSessionId()?.substring(0, 8) + "...";
+          document.getElementById("timeSpent").textContent = Math.floor(
+            NewsAnalytics.getTimeSpent() / 1000
+          );
+          document.getElementById("scrollDepth").textContent =
+            NewsAnalytics.getScrollDepth();
+          document.getElementById("maxScrollDepth").textContent =
+            NewsAnalytics.getMaxScrollDepth();
+          document.getElementById("eventCount").textContent = eventCount;
+        } else {
+          document.getElementById("debugStatus").textContent = isConfigured
+            ? "Loading..."
+            : "Not Configured";
+        }
+      }
+
+      // Test functions
+      function testNewsletterSignup() {
+        if (window.NewsAnalytics && window.NewsAnalytics.track) {
+          NewsAnalytics.track("newsletter_signup", {
+            source: "demo_page",
+            location: "test_button",
+          });
+          eventCount++;
+          alert("Newsletter signup event tracked!");
+        } else {
+          alert("Analytics not active. Check configuration.");
+        }
+      }
+
+      function testCommentSubmit() {
+        if (window.NewsAnalytics && window.NewsAnalytics.track) {
+          NewsAnalytics.track("comment_submit", {
+            articleId: "demo-article",
+            commentLength: 125,
+          });
+          eventCount++;
+          alert("Comment submit event tracked!");
+        } else {
+          alert("Analytics not active. Check configuration.");
+        }
+      }
+
+      function sendTestEvent() {
+        if (window.NewsAnalytics && window.NewsAnalytics.track) {
+          NewsAnalytics.track("manual_test", {
+            timestamp: new Date().toISOString(),
+            testType: "manual_button_click",
+            userAgent: navigator.userAgent.substring(0, 50),
+          });
+          eventCount++;
+          alert("Test event sent! Check your Supabase database.");
+        } else {
+          alert("Analytics not active. Check configuration.");
+        }
+      }
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        // Scroll tracking
+        window.addEventListener("scroll", updateScrollIndicator);
+
+        // Social share buttons
+        document.querySelectorAll(".social-share").forEach((button) => {
+          button.addEventListener("click", function () {
+            const platform = this.dataset.platform;
+
+            if (window.NewsAnalytics && window.NewsAnalytics.track) {
+              NewsAnalytics.track("social_share", {
+                platform: platform,
+                url: window.location.href,
+                title: document.title,
+              });
+              eventCount++;
+            }
+
+            alert(`${platform} share tracked!`);
+          });
+        });
+
+        // Update debug panel regularly
+        setInterval(updateDebugPanel, 1000);
+        updateDebugPanel();
+
+        // Console instructions
+        console.log(`
+🧪 NEWS ANALYTICS DEMO LOADED
+
+Configuration Status:
+- Using built-in database configuration ✅
+- Analytics Status: ${isActive ? "ACTIVE" : "INITIALIZING"}
+
+Manual Testing Commands:
+- NewsAnalytics.track('custom_event', {data: 'test'})
+- NewsAnalytics.getUserId()
+- NewsAnalytics.getSessionId() 
+- NewsAnalytics.getTimeSpent()
+- NewsAnalytics.getScrollDepth()
+- NewsAnalytics.retryFailedEvents()
+
+To test:
+1. Scroll down the page to trigger scroll milestones
+2. Click on links and buttons to test interactions
+3. Use the Test Event button to send custom events
+4. Check the analytics dashboard to see your data
+
+Events being tracked:
+- page_view (automatic)
+- link_click (automatic) 
+- heartbeat (every 3 seconds)
+- scroll_milestone (at 75%)
+- page_exit (on page leave)
+- social_share (button clicks)
+- custom events (button clicks)
+            `);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News Analytics Tracker - Test Page</title>
+    <style>
+      body {
+        font-family: "Georgia", serif;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        color: #333;
+      }
+
+      .header {
+        text-align: center;
+        padding: 40px 0;
+        border-bottom: 2px solid #e0e0e0;
+        margin-bottom: 30px;
+      }
+
+      .article-meta {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-style: italic;
+      }
+
+      .content {
+        font-size: 18px;
+        line-height: 1.8;
+      }
+
+      .content p {
+        margin-bottom: 20px;
+      }
+
+      .content h2 {
+        color: #2c3e50;
+        margin-top: 40px;
+        margin-bottom: 20px;
+      }
+
+      .test-links {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+      }
+
+      .test-links h3 {
+        margin-top: 0;
+        color: #495057;
+      }
+
+      .test-links a {
+        display: inline-block;
+        margin: 5px 10px 5px 0;
+        padding: 8px 16px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      .test-links a:hover {
+        background: #0056b3;
+      }
+
+      .external-link {
+        background: #28a745 !important;
+      }
+
+      .external-link:hover {
+        background: #1e7e34 !important;
+      }
+
+      .social-share {
+        background: #17a2b8;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .social-share:hover {
+        background: #138496;
+      }
+
+      .newsletter-form {
+        background: #e9ecef;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+      }
+
+      .newsletter-form input[type="email"] {
+        width: 60%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+
+      .newsletter-form button {
+        padding: 10px 20px;
+        background: #fd7e14;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .analytics-status {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 4px;
+        font-size: 14px;
+        z-index: 1000;
+      }
+
+      .debug-panel {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #343a40;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        font-family: "Courier New", monospace;
+        font-size: 12px;
+        max-width: 300px;
+        z-index: 1000;
+      }
+
+      .debug-panel h4 {
+        margin: 0 0 10px 0;
+        color: #ffc107;
+      }
+
+      .debug-panel div {
+        margin: 5px 0;
+      }
+
+      .scroll-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 4px;
+        background: #007bff;
+        z-index: 1001;
+        transition: width 0.3s ease;
+      }
+
+      .long-content {
+        height: 200vh; /* Make page scrollable */
+      }
+
+      @media (max-width: 600px) {
+        .debug-panel {
+          position: relative;
+          bottom: auto;
+          left: auto;
+          margin: 20px 0;
+        }
+
+        .analytics-status {
+          position: relative;
+          top: auto;
+          right: auto;
+          margin: 20px 0;
+          display: inline-block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Scroll progress indicator -->
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+
+    <!-- Analytics status indicator -->
+    <div class="analytics-status" id="analyticsStatus">
+      📊 Analytics Loading...
+    </div>
+
+    <div class="header">
+      <h1>Breaking: Revolutionary News Analytics System Launched</h1>
+      <div class="article-meta">
+        By Tech Reporter | Published: <span id="currentDate"></span> | Reading
+        time: 5 min
+      </div>
+    </div>
+
+    <div class="content">
+      <p>
+        <strong>San Francisco, CA</strong> - In a groundbreaking development for
+        news publishers, a new vanilla JavaScript analytics tracking system has
+        been released that promises to revolutionize how publishers understand
+        their audience engagement.
+      </p>
+
+      <p>
+        The system, built with privacy-first principles and seamless Supabase
+        integration, tracks crucial metrics including page views, article
+        clicks, scroll depth, and time spent reading. Unlike traditional
+        analytics solutions, this tracker requires no external dependencies and
+        works across all website technologies.
+      </p>
+
+      <div class="test-links">
+        <h3>🔗 Test Links (Click to test link tracking)</h3>
+        <a href="#section1">Internal Link - Section 1</a>
+        <a href="#section2">Internal Link - Section 2</a>
+        <a href="https://supabase.com" target="_blank" class="external-link"
+          >External - Supabase</a
+        >
+        <a href="https://github.com" target="_blank" class="external-link"
+          >External - GitHub</a
+        >
+        <a href="/fake-article-1">Another Article</a>
+        <a href="/fake-article-2">Popular Article</a>
+      </div>
+
+      <h2 id="section1">Key Features Driving Adoption</h2>
+
+      <p>
+        Industry experts are particularly excited about the system's
+        comprehensive feature set. "What sets this apart is the balance between
+        powerful analytics and privacy compliance," said Dr. Sarah Chen, a
+        digital publishing researcher at Stanford University.
+      </p>
+
+      <p>
+        The tracker automatically captures essential user behavior data without
+        compromising user privacy. All tracking is anonymous by default, using
+        generated identifiers rather than personal information.
+      </p>
+
+      <p>
+        Publishers can now understand not just how many people visit their
+        articles, but how deeply engaged readers are. The scroll depth tracking
+        reveals whether users are actually reading to the end of articles, while
+        time spent metrics help identify the most engaging content.
+      </p>
+
+      <h2 id="section2">Technical Innovation</h2>
+
+      <p>
+        The technical architecture leverages modern web APIs for accurate
+        tracking. The system uses the Page Visibility API to ensure time
+        tracking only counts when users are actively viewing the page, providing
+        more accurate engagement metrics than traditional solutions.
+      </p>
+
+      <p>
+        "The failed event recovery system is particularly clever," noted Maria
+        Rodriguez, CTO of NewsFlow Publishing. "It stores failed tracking events
+        locally and retries them automatically, ensuring no data is lost even
+        during network interruptions."
+      </p>
+
+      <div style="text-align: center; margin: 40px 0">
+        <h3>📱 Social Sharing Test</h3>
+        <button class="social-share" data-platform="twitter">
+          Share on Twitter
+        </button>
+        <button class="social-share" data-platform="facebook">
+          Share on Facebook
+        </button>
+        <button class="social-share" data-platform="linkedin">
+          Share on LinkedIn
+        </button>
+      </div>
+
+      <h2>Privacy-First Approach</h2>
+
+      <p>
+        With increasing concerns about user privacy and data protection
+        regulations like GDPR, the system was designed with privacy as a core
+        principle. No personally identifiable information is collected, and
+        users can easily opt out of tracking.
+      </p>
+
+      <p>
+        The system generates random user identifiers that persist across
+        sessions but cannot be linked to real-world identities. This approach
+        provides valuable analytics insights while respecting user privacy.
+      </p>
+
+      <div class="newsletter-form">
+        <h3>📧 Newsletter Signup Test</h3>
+        <p>Stay updated with the latest news analytics insights:</p>
+        <form id="newsletter-form">
+          <input type="email" placeholder="Enter your email" required />
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+
+      <h2>Industry Impact</h2>
+
+      <p>
+        Early adopters are already reporting significant insights from the
+        detailed analytics. One major news publisher discovered that their
+        long-form investigative pieces had much higher engagement rates than
+        their short news briefs, leading to a strategic shift in content
+        production.
+      </p>
+
+      <p>
+        "The scroll depth data was eye-opening," said Alex Thompson,
+        Editor-in-Chief at TechDaily News. "We found that readers who scrolled
+        past 75% of an article were three times more likely to click on related
+        articles."
+      </p>
+
+      <p>
+        The system's real-time heartbeat mechanism provides live insights into
+        reader engagement, allowing publishers to see which articles are
+        capturing attention as they're published.
+      </p>
+
+      <h2>Looking Forward</h2>
+
+      <p>
+        As the digital publishing landscape continues to evolve, tools like this
+        analytics system represent a new generation of publisher-focused
+        solutions. By combining powerful insights with privacy protection,
+        publishers can better serve their audiences while respecting user
+        preferences.
+      </p>
+
+      <p>
+        The open-source nature of the project also means that publishers can
+        customize and extend the system to meet their specific needs, something
+        that's often impossible with proprietary analytics solutions.
+      </p>
+
+      <p>
+        With seamless integration options for WordPress, React, and plain HTML
+        sites, the barrier to adoption is remarkably low. Publishers can have
+        comprehensive analytics running within minutes of setup.
+      </p>
+
+      <div class="long-content">
+        <h2>Conclusion</h2>
+
+        <p>
+          This new analytics tracking system represents a significant step
+          forward for news publishers seeking to understand their audience
+          better. By providing detailed engagement metrics while maintaining
+          user privacy, it offers the best of both worlds.
+        </p>
+
+        <p>
+          As more publishers adopt analytics-driven approaches to content
+          strategy, tools like this will become essential for staying
+          competitive in the rapidly evolving digital media landscape.
+        </p>
+
+        <p>
+          <em
+            >This article continues for demonstration purposes to test scroll
+            tracking. Keep scrolling to see how the analytics system captures
+            your reading behavior...</em
+          >
+        </p>
+
+        <p>
+          The implementation details reveal a sophisticated understanding of
+          modern web development challenges. The use of the sendBeacon API for
+          tracking page exits ensures reliable data collection even when users
+          quickly navigate away from pages.
+        </p>
+
+        <p>
+          Performance optimization is another key strength of the system. By
+          debouncing scroll events and using efficient data structures, the
+          tracking script has minimal impact on page performance, a crucial
+          consideration for news sites where loading speed directly impacts user
+          experience and SEO rankings.
+        </p>
+
+        <p>
+          <strong>Congratulations!</strong> If you've scrolled this far, you've
+          triggered several analytics events including scroll milestones and
+          extended time tracking. Check the debug panel to see your engagement
+          metrics in real-time.
+        </p>
+      </div>
+    </div>
+
+    <!-- Debug Panel -->
+    <div class="debug-panel" id="debugPanel">
+      <h4>📊 Analytics Debug</h4>
+      <div>User ID: <span id="userId">Loading...</span></div>
+      <div>Session ID: <span id="sessionId">Loading...</span></div>
+      <div>Time Spent: <span id="timeSpent">0</span>s</div>
+      <div>Scroll Depth: <span id="scrollDepth">0</span>%</div>
+      <div>Max Scroll: <span id="maxScrollDepth">0</span>%</div>
+      <div>Link Clicks: <span id="linkClicks">0</span></div>
+      <div>Custom Events: <span id="customEvents">0</span></div>
+      <button
+        onclick="testCustomEvent()"
+        style="
+          margin-top: 10px;
+          padding: 5px 10px;
+          background: #ffc107;
+          border: none;
+          border-radius: 3px;
+          cursor: pointer;
+        "
+      >
+        Send Test Event
+      </button>
+    </div>
+
+    <!-- Simple configuration - no database credentials needed! -->
+    <script>
+      window.NewsAnalytics = {
+        websiteId: "test-news-site",
+        debug: true, // Enable debug mode to see console logs
+        scrollThreshold: 75, // Consider article "read" at 75%
+        timeInterval: 3000, // Send heartbeat every 3 seconds for demo
+      };
+    </script>
+
+    <!-- Load the news analytics tracker -->
+    <script src="news-analytics-tracker.js"></script>
+
+    <!-- Test page specific JavaScript -->
+    <script>
+      let linkClickCount = 0;
+      let customEventCount = 0;
+
+      // Update current date
+      document.getElementById("currentDate").textContent =
+        new Date().toLocaleDateString();
+
+      // Update scroll indicator
+      function updateScrollIndicator() {
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
+        const scrollHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = (scrollTop / scrollHeight) * 100;
+        document.getElementById("scrollIndicator").style.width =
+          scrollPercent + "%";
+      }
+
+      window.addEventListener("scroll", updateScrollIndicator);
+
+      // Update debug panel
+      function updateDebugPanel() {
+        if (window.NewsAnalytics) {
+          document.getElementById("userId").textContent =
+            NewsAnalytics.getUserId()?.substring(0, 12) + "...";
+          document.getElementById("sessionId").textContent =
+            NewsAnalytics.getSessionId()?.substring(0, 12) + "...";
+          document.getElementById("timeSpent").textContent = Math.floor(
+            NewsAnalytics.getTimeSpent() / 1000
+          );
+          document.getElementById("scrollDepth").textContent =
+            NewsAnalytics.getScrollDepth();
+          document.getElementById("maxScrollDepth").textContent =
+            NewsAnalytics.getMaxScrollDepth();
+          document.getElementById("linkClicks").textContent = linkClickCount;
+          document.getElementById("customEvents").textContent =
+            customEventCount;
+        }
+      }
+
+      // Update analytics status
+      function updateAnalyticsStatus() {
+        const status = document.getElementById("analyticsStatus");
+
+        if (window.NewsAnalytics && window.NewsAnalytics.getUserId) {
+          status.textContent = "✅ Analytics Active";
+          status.style.background = "#28a745";
+        } else {
+          status.textContent = "❌ Analytics Not Configured";
+          status.style.background = "#dc3545";
+        }
+      }
+
+      // Initialize when DOM is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        // Track link clicks for debug counter
+        document.addEventListener("click", function (event) {
+          const link = event.target.closest("a");
+          if (link && link.href) {
+            linkClickCount++;
+          }
+        });
+
+        // Social share tracking
+        document.querySelectorAll(".social-share").forEach((button) => {
+          button.addEventListener("click", function () {
+            const platform = this.dataset.platform;
+
+            if (window.NewsAnalytics && window.NewsAnalytics.track) {
+              NewsAnalytics.track("social_share", {
+                platform: platform,
+                articleTitle: document.title,
+                shareUrl: window.location.href,
+                shareLocation: "article_content",
+              });
+              customEventCount++;
+            }
+
+            alert(
+              `Shared on ${platform}! (This would normally open share dialog)`
+            );
+          });
+        });
+
+        // Newsletter form tracking
+        const newsletterForm = document.getElementById("newsletter-form");
+        if (newsletterForm) {
+          newsletterForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            if (window.NewsAnalytics && window.NewsAnalytics.track) {
+              NewsAnalytics.track("newsletter_signup", {
+                formLocation: "article_bottom",
+                articleUrl: window.location.href,
+                articleTitle: document.title,
+              });
+              customEventCount++;
+            }
+
+            alert(
+              "Newsletter signup tracked! (This would normally submit the form)"
+            );
+          });
+        }
+
+        // Update status and debug panel periodically
+        setInterval(function () {
+          updateAnalyticsStatus();
+          updateDebugPanel();
+        }, 1000);
+
+        // Initial update
+        updateAnalyticsStatus();
+        updateDebugPanel();
+      });
+
+      // Test custom event function
+      function testCustomEvent() {
+        if (window.NewsAnalytics && window.NewsAnalytics.track) {
+          NewsAnalytics.track("manual_test_event", {
+            testData: "Manual test from debug panel",
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent.substring(0, 50) + "...",
+          });
+          customEventCount++;
+          alert("Test event sent! Check your Supabase database.");
+        } else {
+          alert(
+            "Analytics not configured. Please set your Supabase credentials in the script tag."
+          );
+        }
+      }
+
+      // Console helper for manual testing
+      console.log(`
+🧪 NEWS ANALYTICS TEST PAGE LOADED
+
+Available test functions:
+- testCustomEvent() - Send a manual test event
+- NewsAnalytics.track('event_name', {data}) - Send custom events
+- NewsAnalytics.getUserId() - Get current user ID
+- NewsAnalytics.getSessionId() - Get current session ID
+- NewsAnalytics.getTimeSpent() - Get time spent on page
+- NewsAnalytics.retryFailedEvents() - Retry any failed events
+
+Test by:
+1. Scrolling down to trigger scroll events
+2. Clicking on links to trigger link events
+3. Clicking social share buttons
+4. Submitting the newsletter form
+5. Using the debug panel test button
+
+Check your Supabase database 'analytics_events' table to see the tracked data!
+        `);
+    </script>
+  </body>
+</html>
